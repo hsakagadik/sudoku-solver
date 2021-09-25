@@ -1,20 +1,24 @@
+const { expect } = require('chai');
 const chai = require('chai');
 const assert = chai.assert;
 
 const Solver = require('../controllers/sudoku-solver.js');
-let solver;
+let solver = new Solver();
 
 suite('UnitTests', () => {
     test('Logic handles a valid puzzle string of 81 characters', function(){
-        assert.fail();
+        const s = '..9..5.1.85.4....2432......1...69.83.9.....6.62.71...9......1945....4.37.4.3..6..';
+        assert.isTrue(solver.validate(s), 'a valid puzzle string should retrieve true');
     });
 
     test('Logic handles a puzzle string with invalid characters (not 1-9 or .)', function(){
-        assert.fail();
+        const s = '..A..5.1.85.4....2432......1...69.83.9.....6.62.71...9......1945....4.37.4.3..6..';
+        assert.deepEqual(solver.validate(s).message, 'Invalid characters in puzzle');
     });
 
     test('Logic handles a puzzle string that is not 81 characters in length', function(){
-        assert.fail();
+        const s = '..5.1.85.4....2432......1...69.83.9.....6.62.71...9......1945....4.37.4.3..6..';
+        assert.deepEqual(solver.validate(s).message, 'Expected puzzle to be 81 characters long');
     });
 
     test('Logic handles a valid row placement', function(){
