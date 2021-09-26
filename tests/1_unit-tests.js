@@ -6,9 +6,10 @@ const Solver = require('../controllers/sudoku-solver.js');
 let solver = new Solver();
 
 suite('UnitTests', () => {
+    const validString = '..9..5.1.85.4....2432......1...69.83.9.....6.62.71...9......1945....4.37.4.3..6..';
+
     test('Logic handles a valid puzzle string of 81 characters', function(){
-        const s = '..9..5.1.85.4....2432......1...69.83.9.....6.62.71...9......1945....4.37.4.3..6..';
-        assert.isTrue(solver.validate(s), 'a valid puzzle string should retrieve true');
+        assert.isTrue(solver.validate(validString), 'a valid puzzle string should retrieve true');
     });
 
     test('Logic handles a puzzle string with invalid characters (not 1-9 or .)', function(){
@@ -22,23 +23,23 @@ suite('UnitTests', () => {
     });
 
     test('Logic handles a valid row placement', function(){
-        assert.fail();
+        assert.isFalse(solver.checkRowPlacement(validString,2, 0, 7), 'a valid row placement should retrieve false');
     });
 
     test('Logic handles a valid column placement', function(){
-        assert.fail();
+        assert.isFalse(solver.checkColPlacement(validString,0, 2, 7), 'a valid col placement should retrieve false');
     });
 
     test('Logic handles an invalid column placement', function(){
-        assert.fail();
+        assert.isTrue(solver.checkColPlacement(validString,0, 2, 9), 'a valid col placement should retrieve true');
     });
 
     test('Logic handles a valid region (3x3 grid) placement', function(){
-        assert.fail();
+        assert.isFalse(solver.checkRegionPlacement(validString,5, 0, 5), 'a valid grid placement should retrieve false');
     });
 
     test('Logic handles an invalid region (3x3 grid) placement', function(){
-        assert.fail();
+        assert.isTrue(solver.checkRegionPlacement(validString,5, 0, 6), 'a valid grid placement should retrieve true');
     });
 
     test('Valid puzzle strings pass the solver', function(){
