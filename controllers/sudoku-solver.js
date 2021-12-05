@@ -43,9 +43,9 @@ class SudokuSolver {
     return region.join('').includes(value.toString());
   }
 
-  checkValue(puzzleString, row, column, value){
-    return this.checkRowPlacement(puzzleString, row, column, value) && 
-           this.checkColPlacement(puzzleString, row, column, value) && 
+  isInvalidValue(puzzleString, row, column, value){
+    return this.checkRowPlacement(puzzleString, row, column, value) || 
+           this.checkColPlacement(puzzleString, row, column, value) || 
            this.checkRegionPlacement(puzzleString, row, column, value);
   }
 
@@ -60,12 +60,12 @@ class SudokuSolver {
     }
   }
 
-  addValueToArr(puzzleArr, row, column, number){
-    let puzzle = [...puzzleArr];
+  addValueToStr(puzzleStr, row, column, number){
+    let puzzle = puzzleStr.match(/.{1,9}/g);
     let rowArr = puzzle[row].split('');
-    rowArr.splice(column, 1, number)
-    puzzle.splice(row, 1, rowArr.join(''))
-    return puzzle;
+    rowArr.splice(column, 1, number);
+    puzzle.splice(row, 1, rowArr.join(''));
+    return puzzle.join('');
   }
 
   solve(puzzleString) {
@@ -74,15 +74,20 @@ class SudokuSolver {
     const column = emptyValue[1];
 
     if (row === -1) { return puzzleString }
-    let puzzleArr = puzzleString.match(/.{1,9}/g);
 
-    for (let num = 0; num < 10; num++) {
-      if (this.checkValue(puzzleString, row, column, num)) {
-        puzzleArr = this.addValueToArr(puzzleArr, row, column, num);
-        this.solve(puzzleArr.join(''));
+    for (let num = 1; num <= 9; num++) {
+      if (!this.isInvalidValue(puzzleString, row, column, num)) {
+        const newStr = this.addValueToStr(puzzleString, row, column, num);
+        const result = this.solve(newStr);
+        if(result === newStr){
+          puzzleString = result;
+          continue;
+        } else {
+          return result;
+        }
       }
     }
-    return puzzleArr.join('');
+    return puzzleString;
   }
 
 }
