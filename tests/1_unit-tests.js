@@ -3,10 +3,12 @@ const chai = require('chai');
 const assert = chai.assert;
 
 const Solver = require('../controllers/sudoku-solver.js');
+const puzzleStrings = require('../controllers/puzzle-strings').puzzlesAndSolutions;
 let solver = new Solver();
 
 suite('UnitTests', () => {
-    const validString = '..9..5.1.85.4....2432......1...69.83.9.....6.62.71...9......1945....4.37.4.3..6..';
+    const validString = puzzleStrings[0][0];
+    const solution = puzzleStrings[0][1];
 
     test('Logic handles a valid puzzle string of 81 characters', function(){
         assert.isTrue(solver.validate(validString), 'a valid puzzle string should retrieve true');
@@ -27,11 +29,11 @@ suite('UnitTests', () => {
     });
 
     test('Logic handles a valid column placement', function(){
-        assert.isFalse(solver.checkColPlacement(validString,0, 2, 7), 'a valid col placement should retrieve false');
+        assert.isFalse(solver.checkColPlacement(validString,0, 2, 4), 'a valid col placement should retrieve false');
     });
 
     test('Logic handles an invalid column placement', function(){
-        assert.isTrue(solver.checkColPlacement(validString,0, 2, 9), 'a valid col placement should retrieve true');
+        assert.isTrue(solver.checkColPlacement(validString,0, 2, 9), 'an invalid col placement should retrieve true');
     });
 
     test('Logic handles a valid region (3x3 grid) placement', function(){
@@ -39,11 +41,11 @@ suite('UnitTests', () => {
     });
 
     test('Logic handles an invalid region (3x3 grid) placement', function(){
-        assert.isTrue(solver.checkRegionPlacement(validString,5, 0, 6), 'a valid grid placement should retrieve true');
+        assert.isTrue(solver.checkRegionPlacement(validString,5, 0, 7), 'an invalid grid placement should retrieve true');
     });
 
     test('Valid puzzle strings pass the solver', function(){
-        assert.fail();
+        assert.deepEqual(solver.solve(validString), solution, 'a valid string should be resolved');
     });
 
     test('Invalid puzzle strings fail the solver', function(){
