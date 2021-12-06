@@ -4,10 +4,15 @@ class SudokuSolver {
     const rxCharSet = new RegExp(/[\d|\.]{81}/);
     const ERR_SIZE = new Error('Expected puzzle to be 81 characters long');
     const ERR_CHARSET = new Error('Invalid characters in puzzle');
+    const ERR_INVALID = new Error('Puzzle cannot be solved');
     if (puzzleString.length != 81) {
       return ERR_SIZE;
+    } else if (!rxCharSet.test(puzzleString)){
+      return ERR_CHARSET
+    } else if (this.solve(puzzleString) === puzzleString) {
+      return ERR_INVALID;
     }
-    return rxCharSet.test(puzzleString) ? true : ERR_CHARSET;
+    return true;
   }
 
   getGrid(num) {
@@ -22,12 +27,12 @@ class SudokuSolver {
     return res;
   }
 
-  checkRowPlacement(puzzleString, row, column, value) {
+  checkRowPlacement(puzzleString, row, value) {
     const arr = puzzleString.match(/.{1,9}/g);
     return arr[row].split('').includes(value.toString());
   }
 
-  checkColPlacement(puzzleString, row, column, value) {
+  checkColPlacement(puzzleString, column, value) {
     const arr = puzzleString.match(/.{1,9}/g);
     let columnArr = [];
     arr.forEach(e => { columnArr.push(e[column]) });
@@ -44,10 +49,8 @@ class SudokuSolver {
   }
 
   isInvalidValue(puzzleString, row, column, value) {
-    return this.checkRowPlacement(puzzleString, row, column, value) ||
-      this.checkColPlacement(puzzleString, row, column, value) ||
-      this.checkColPlacement(puzzleString, row, column, value) ||
-      this.checkColPlacement(puzzleString, row, column, value) ||
+    return this.checkRowPlacement(puzzleString, row, value) ||
+      this.checkColPlacement(puzzleString, column, value) ||
       this.checkRegionPlacement(puzzleString, row, column, value);
   }
 
@@ -84,7 +87,7 @@ class SudokuSolver {
       }
     }
 
-    if (this.nextEmptyValue(puzzleString)[0] !== -1){
+    if (this.nextEmptyValue(puzzleString)[0] !== -1) {
       puzzleString = this.addValueToStr(puzzleString, row, column, ".");
     }
 

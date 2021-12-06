@@ -25,15 +25,15 @@ suite('UnitTests', () => {
     });
 
     test('Logic handles a valid row placement', function () {
-        assert.isFalse(solver.checkRowPlacement(validString, 2, 0, 7), 'a valid row placement should retrieve false');
+        assert.isFalse(solver.checkRowPlacement(validString, 2, 7), 'a valid row placement should retrieve false');
     });
 
     test('Logic handles a valid column placement', function () {
-        assert.isFalse(solver.checkColPlacement(validString, 0, 2, 4), 'a valid col placement should retrieve false');
+        assert.isFalse(solver.checkColPlacement(validString, 2, 4), 'a valid col placement should retrieve false');
     });
 
     test('Logic handles an invalid column placement', function () {
-        assert.isTrue(solver.checkColPlacement(validString, 0, 2, 9), 'an invalid col placement should retrieve true');
+        assert.isTrue(solver.checkColPlacement(validString, 2, 9), 'an invalid col placement should retrieve true');
     });
 
     test('Logic handles a valid region (3x3 grid) placement', function () {
@@ -49,10 +49,12 @@ suite('UnitTests', () => {
     });
 
     test('Invalid puzzle strings fail the solver', function () {
-        assert.fail();
+        const invalidString = '5..91311.3...8.5.1.1.21..8.68.17.23...95..46.7.1.....5.2.......1..8911..85.12...1';
+        assert.deepEqual(solver.validate(invalidString).message, 'Puzzle cannot be solved', 'an invalid sudoku string should fail');
     });
 
     test('Solver returns the expected solution for an incomplete puzzle', function () {
-        assert.fail();
+        const incompletePuzzle = '1.5..2.....63.12.7.2..5.....9..1....8.2.36...3.7.2..9.47...8..1..16....926914.37.';
+        assert.deepEqual(solver.solve(incompletePuzzle), solution, 'an incomplete sudoku string should be resolved');
     });
 });
