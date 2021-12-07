@@ -1,4 +1,3 @@
-const { expect } = require('chai');
 const chai = require('chai');
 const assert = chai.assert;
 
@@ -11,7 +10,7 @@ suite('UnitTests', () => {
     const solution = puzzleStrings[0][1];
 
     test('Logic handles a valid puzzle string of 81 characters', function () {
-        assert.isTrue(solver.validate(validString), 'a valid puzzle string should retrieve true');
+        assert.isTrue(solver.validate(validString), 'a valid puzzle string should retrieve an string');
     });
 
     test('Logic handles a puzzle string with invalid characters (not 1-9 or .)', function () {
@@ -49,7 +48,7 @@ suite('UnitTests', () => {
     });
 
     test('Invalid puzzle strings fail the solver', function () {
-        const invalidString = '5..91311.3...8.5.1.1.21..8.68.17.23...95..46.7.1.....5.2.......1..8911..85.12...1';
+        const invalidString = '1..11111.1...8.5.1.1.21..8.68.17.23...95..46.7.1.....5.2.......1..8911..85.12...1';
         assert.deepEqual(solver.validate(invalidString).message, 'Puzzle cannot be solved', 'an invalid sudoku string should fail');
     });
 

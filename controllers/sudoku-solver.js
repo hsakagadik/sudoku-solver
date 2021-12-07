@@ -7,15 +7,21 @@ class SudokuSolver {
     const ERR_INVALID = new Error('Puzzle cannot be solved');
     if (puzzleString.length != 81) {
       return ERR_SIZE;
-    } else if (!rxCharSet.test(puzzleString)){
+    } else if (!rxCharSet.test(puzzleString)) {
       return ERR_CHARSET
-    } else if (this.solve(puzzleString) === puzzleString) {
-      return ERR_INVALID;
+    } else {
+      if (!this.checkIfValidSudoku(puzzleString)) {
+        return ERR_INVALID;
+      }
+      return true;
     }
-    return true;
   }
 
-  getGrid(num) {
+  hasDuplicates(array) {
+    return (new Set(array)).size !== array.length;
+  }
+
+  getGridLowHigh(num) {
     let res;
     if (num < 3) {
       res = { low: 0, high: 3 }
@@ -27,24 +33,49 @@ class SudokuSolver {
     return res;
   }
 
+  checkIfValidSudoku(puzzleString) {
+    const puzzleArr = puzzleString.match(/.{1,9}/g);
+
+    for (let num = 0; num <= 8; num++) {
+      const rowArr = puzzleArr[num].split('');
+
+      let columnArr = [];
+      puzzleArr.forEach(e => { columnArr.push(e[num]) });
+
+      let region = [];
+      const r = this.getGridLowHigh(num);
+      const c = this.getGridLowHigh(num);
+      puzzleArr.slice(r.low, r.high).forEach(e => { region.push(e.slice(c.low, c.high).split('')) })
+
+      if (this.hasDuplicates(rowArr.filter(e => e !== ".")) ||
+        this.hasDuplicates(columnArr.filter(e => e !== ".")) ||
+        this.hasDuplicates(region.filter(e => e !== "."))
+      ) {
+        return false;
+      }
+    }
+    return true;
+  }
+
   checkRowPlacement(puzzleString, row, value) {
-    const arr = puzzleString.match(/.{1,9}/g);
-    return arr[row].split('').includes(value.toString());
+    const puzzleArr = puzzleString.match(/.{1,9}/g);
+    const rowArr = puzzleArr[row].split('');
+    return rowArr.includes(value.toString());
   }
 
   checkColPlacement(puzzleString, column, value) {
-    const arr = puzzleString.match(/.{1,9}/g);
+    const puzzleArr = puzzleString.match(/.{1,9}/g);
     let columnArr = [];
-    arr.forEach(e => { columnArr.push(e[column]) });
+    puzzleArr.forEach(e => { columnArr.push(e[column]) });
     return columnArr.includes(value.toString());
   }
 
   checkRegionPlacement(puzzleString, row, column, value) {
-    const arr = puzzleString.match(/.{1,9}/g);
+    const puzzleArr = puzzleString.match(/.{1,9}/g);
     let region = [];
-    const r = this.getGrid(row);
-    const c = this.getGrid(column);
-    arr.slice(r.low, r.high).forEach(e => { region.push(e.slice(c.low, c.high).split('')) })
+    const r = this.getGridLowHigh(row);
+    const c = this.getGridLowHigh(column);
+    puzzleArr.slice(r.low, r.high).forEach(e => { region.push(e.slice(c.low, c.high).split('')) })
     return region.join('').includes(value.toString());
   }
 
@@ -77,7 +108,6 @@ class SudokuSolver {
     const emptyValue = this.nextEmptyValue(puzzleString);
     const row = emptyValue[0];
     const column = emptyValue[1];
-
     if (row === -1) { return puzzleString }
 
     for (let num = 1; num <= 9; num++) {
