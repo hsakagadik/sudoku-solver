@@ -18,14 +18,14 @@ module.exports = function (app) {
 
   app.route('/api/solve')
     .post((req, res) => {
-      try {
-        if (req.body.puzzle === "" || req.body.puzzle === undefined) { req.json({ error: 'Required field missing' }) }
-        if (solver.validate(req.body.puzzle)) {
-          const resString = solver.solve(req.body.puzzle);
-          res.json(resString);
-        }
-      } catch (error) {
-        res.send(error);
+      const puzzle = req.body.puzzle;
+      if (puzzle === "" || puzzle === undefined) { res.json({ error: 'Required field missing' }) }
+      const validateRes = solver.validate(puzzle);
+      if (typeof validateRes !== 'boolean') {
+        res.json({ error: validateRes.message});
+      } else if (validateRes) {
+        const resString = solver.solve(puzzle);
+        res.json(resString);
       }
     });
 };

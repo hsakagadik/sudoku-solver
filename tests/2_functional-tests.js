@@ -33,7 +33,7 @@ suite('Functional Tests', () => {
       });
   });
 
-  test('Solve a puzzle with invalid characters: POST request to /api/solve', function (done) {
+  test('Solve a puzzle with invalid characters: POST request to /api/solve', function (done) {1
     const invalidChars = '..A..5.1.85.4....2432......1...69.83.9.....6.62.71...9......1945....4.37.4.3..6..';
     const body = { puzzle: invalidChars };
     const errorResponse = { error: 'Invalid characters in puzzle' };
@@ -73,7 +73,7 @@ suite('Functional Tests', () => {
   });
 
   test('Check a puzzle placement with all fields: POST request to /api/check', function (done) {
-    const body = {};
+    const body = {puzzle: validPuzzle, coordinate: "", value: ""};
     chai.request(server)
       .post('/api/check')
       .send(body)
