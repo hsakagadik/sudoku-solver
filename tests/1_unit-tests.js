@@ -10,7 +10,7 @@ suite('UnitTests', () => {
     const solution = puzzleStrings[0][1];
 
     test('Logic handles a valid puzzle string of 81 characters', function () {
-        assert.isTrue(solver.validate(validString), 'a valid puzzle string should retrieve an string');
+        assert.isUndefined(solver.validate(validString), 'a valid puzzle string should retrieve an string');
     });
 
     test('Logic handles a puzzle string with invalid characters (not 1-9 or .)', function () {
@@ -24,23 +24,31 @@ suite('UnitTests', () => {
     });
 
     test('Logic handles a valid row placement', function () {
-        assert.isFalse(solver.checkRowPlacement(validString, 2, 7), 'a valid row placement should retrieve false');
+        assert.isUndefined(solver.checkRowPlacement(validString, 2, 0, 7), 'a valid row placement should retrieve undefined');
+    });
+
+    test('Logic handles a valid row placement that is already placed', function () {
+        assert.isUndefined(solver.checkRowPlacement(validString, 2, 0, 7), 'a valid row placement that is already placed should retrieve undefined');
     });
 
     test('Logic handles a valid column placement', function () {
-        assert.isFalse(solver.checkColPlacement(validString, 2, 4), 'a valid col placement should retrieve false');
+        assert.isUndefined(solver.checkColPlacement(validString, 1, 2, 4), 'a valid col placement should retrieve undefined');
+    });
+
+    test('Logic handles an valid column placement that is already placed', function () {
+        assert.isUndefined(solver.checkColPlacement(validString, 0, 0, 1), 'a valid col placement that is already placed  should retrieve undefined');
     });
 
     test('Logic handles an invalid column placement', function () {
-        assert.isTrue(solver.checkColPlacement(validString, 2, 9), 'an invalid col placement should retrieve true');
+        assert.deepEqual(solver.checkColPlacement(validString, 1, 2, 9), "column", 'an invalid col placement should retrieve true');
     });
 
     test('Logic handles a valid region (3x3 grid) placement', function () {
-        assert.isFalse(solver.checkRegionPlacement(validString, 5, 0, 5), 'a valid grid placement should retrieve false');
+        assert.isUndefined(solver.checkRegionPlacement(validString, 5, 0, 5), 'a valid grid placement should retrieve false');
     });
 
     test('Logic handles an invalid region (3x3 grid) placement', function () {
-        assert.isTrue(solver.checkRegionPlacement(validString, 5, 0, 7), 'an invalid grid placement should retrieve true');
+        assert.deepEqual(solver.checkRegionPlacement(validString, 5, 0, 7), "region", 'an invalid grid placement should retrieve true');
     });
 
     test('Valid puzzle strings pass the solver', function () {

@@ -9,26 +9,19 @@ class SudokuSolver {
       return ERR_SIZE;
     } else if (!rxCharSet.test(puzzleString)) {
       return ERR_CHARSET
-    } else {
-      if (!this.checkIfValidSudoku(puzzleString)) {
-        return ERR_INVALID;
-      }
-      return true;
+    } else if (!this.checkIfValidSudoku(puzzleString)) {
+      return ERR_INVALID;
     }
-  }
-
-  hasDuplicates(array) {
-    return (new Set(array)).size !== array.length;
   }
 
   getGridLowHigh(num) {
     let res;
     if (num < 3) {
-      res = { low: 0, high: 3 }
+      res = [0, 1, 2];
     } else if (num >= 3 && num < 6) {
-      res = { low: 3, high: 6 }
+      res = [3, 4, 5];
     } else {
-      res = { low: 6, high: 9 }
+      res = [6, 7, 8];
     }
     return res;
   }
@@ -38,18 +31,16 @@ class SudokuSolver {
 
     for (let num = 0; num <= 8; num++) {
       const rowArr = puzzleArr[num].split('');
-
       let columnArr = [];
       puzzleArr.forEach(e => { columnArr.push(e[num]) });
-
       let region = [];
       const r = this.getGridLowHigh(num);
       const c = this.getGridLowHigh(num);
       puzzleArr.slice(r.low, r.high).forEach(e => { region.push(e.slice(c.low, c.high).split('')) })
 
-      if (this.hasDuplicates(rowArr.filter(e => e !== ".")) ||
-        this.hasDuplicates(columnArr.filter(e => e !== ".")) ||
-        this.hasDuplicates(region.filter(e => e !== "."))
+      if (hasDuplicates(rowArr.filter(e => e !== ".")) ||
+        hasDuplicates(columnArr.filter(e => e !== ".")) ||
+        hasDuplicates(region.filter(e => e !== "."))
       ) {
         return false;
       }
@@ -57,17 +48,21 @@ class SudokuSolver {
     return true;
   }
 
-  checkRowPlacement(puzzleString, row, value) {
+  checkRowPlacement(puzzleString, row, column, value) {
     const puzzleArr = puzzleString.match(/.{1,9}/g);
     const rowArr = puzzleArr[row].split('');
-    return rowArr.includes(value.toString());
+    if (rowArr.indexOf(value.toString()) !== column && rowArr.includes(value.toString())) {
+      return "row";
+    }
   }
 
-  checkColPlacement(puzzleString, column, value) {
+  checkColPlacement(puzzleString, row, column, value) {
     const puzzleArr = puzzleString.match(/.{1,9}/g);
     let columnArr = [];
     puzzleArr.forEach(e => { columnArr.push(e[column]) });
-    return columnArr.includes(value.toString());
+    if (columnArr.indexOf(value.toString()) !== row && columnArr.includes(value.toString())) {
+      return "column";
+    }
   }
 
   checkRegionPlacement(puzzleString, row, column, value) {
@@ -75,14 +70,28 @@ class SudokuSolver {
     let region = [];
     const r = this.getGridLowHigh(row);
     const c = this.getGridLowHigh(column);
-    puzzleArr.slice(r.low, r.high).forEach(e => { region.push(e.slice(c.low, c.high).split('')) })
-    return region.join('').includes(value.toString());
+
+    const minRow = Math.min(...r);
+    const minCol = Math.min(...c);
+    const maxRow = Math.max(...r);
+    const maxCol = Math.max(...c);
+
+    puzzleArr.slice(minRow, maxRow+1).forEach(e => { region.push(e.slice(minCol, maxCol+1).split('')) });
+
+    const regionRow = r.indexOf(row);
+    const regionCol = c.indexOf(column);
+    if (region[regionRow][regionCol] !== value.toString() && region.join('').includes(value.toString())) {
+      return "region";
+    }
   }
 
   isInvalidValue(puzzleString, row, column, value) {
-    return this.checkRowPlacement(puzzleString, row, value) ||
-      this.checkColPlacement(puzzleString, column, value) ||
-      this.checkRegionPlacement(puzzleString, row, column, value);
+    const rowCheck = this.checkRowPlacement(puzzleString, row, column, value);
+    const columnCheck = this.checkColPlacement(puzzleString, row, column, value);
+    const regionCheck = this.checkRegionPlacement(puzzleString, row, column, value);
+    if (rowCheck || columnCheck || regionCheck) {
+      return [rowCheck, columnCheck, regionCheck].filter((c) => c);
+    }
   }
 
   nextEmptyValue(puzzleString) {
@@ -108,7 +117,7 @@ class SudokuSolver {
     const emptyValue = this.nextEmptyValue(puzzleString);
     const row = emptyValue[0];
     const column = emptyValue[1];
-    if (row === -1) { return puzzleString }
+    if (row === -1) { return puzzleString; }
 
     for (let num = 1; num <= 9; num++) {
       if (!this.isInvalidValue(puzzleString, row, column, num)) {
@@ -127,3 +136,6 @@ class SudokuSolver {
 
 module.exports = SudokuSolver;
 
+function hasDuplicates(array) {
+  return (new Set(array)).size !== array.length;
+}
